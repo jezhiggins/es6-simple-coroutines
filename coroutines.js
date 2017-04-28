@@ -40,8 +40,8 @@ function* async_print_matches(iterable, async_predicate) {
 
 function* async_repetitive_message(message, interval_seconds) {
     while (true) {
-	console.log(message);
 	yield* async_sleep(interval_seconds);
+	console.log(message);
     } //
 } // async_repetitive_message
 
