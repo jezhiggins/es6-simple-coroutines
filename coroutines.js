@@ -11,7 +11,7 @@ function* lucas_sequence() {
 function* async_is_prime(x) {
     if (x < 2)
 	return false;
-    for (let i = 2; i <= Math.sqrt(x) + 1; ++i) {
+    for (let i = 2; i != Math.sqrt(x) + 1; ++i) {
 	if (x % i == 0)
 	    return false;
 	yield* async_sleep(0);
@@ -68,6 +68,10 @@ class task {
     next() {
 	return this.iterable_.next();
     } // next
+
+    return() {
+	return this.iterable_.return();
+    } // return
 }
 task.next_id_gen = function*() {
     let id = 0;
@@ -76,25 +80,32 @@ task.next_id_gen = function*() {
 } // next_id_gen
 task.next_id = task.next_id_gen();
 
-
 class scheduler {
     constructor() {
 	this.tasks_ = []
+	this.monitor_ = null;
     }
 
     add_task(generator) {
 	this.tasks_.push(new task(generator));
     }
+    set_monitor(generator) {
+	this.monitor_ = generator;
+    }
 
     run() {
+	let done = false;
 	while (this.tasks_.length != 0) {
 	    const task = this.tasks_[0];
 	    this.tasks_ = this.tasks_.slice(1);
-	    const step = task.next();
+	    const step = !done ? task.next() : task.return();
 	    if (step.done)
 		console.log(`Task ${task.id} completed with exit value: ${step.value}`);
 	    else
 		this.tasks_ = this.tasks_.concat([task]);
+
+	    if (this.monitor_)
+		done = this.monitor_.next().done;
 	} // while
     } // run
 } // scheduler
@@ -102,5 +113,5 @@ class scheduler {
 const loop = new scheduler();
 loop.add_task(async_repetitive_message("Unexpected item in the bagging area", 2));
 loop.add_task(async_print_matches(lucas_sequence(), async_is_prime));
-loop.add_task(async_message_after("SCREW THIS!", 5));
+loop.set_monitor(async_message_after("SCREW THIS!", 25));
 loop.run();
