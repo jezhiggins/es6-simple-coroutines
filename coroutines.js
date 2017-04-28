@@ -1,7 +1,6 @@
 
 function* lucas_sequence() {
-    let a = 2;
-    let b = 1;
+    let a = 2, b = 1;
     yield a;
     while (true) {
 	yield b;
