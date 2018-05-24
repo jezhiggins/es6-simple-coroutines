@@ -1,9 +1,4 @@
-function* async_search(iterable, async_predicate) {
-    for (const item of iterable)
-	if (yield* async_predicate(item))
-	    return item;
-    return null;
-} // async_search
+#!/usr/bin/env node
 
 function* lucas_sequence() {
     let a = 2, b = 1;
@@ -13,6 +8,18 @@ function* lucas_sequence() {
 	[a, b] = [b, a + b];
     }
 } // lucas_sequence
+
+function* int_range(from, to) {
+    for (let i = from; i <= to; ++i)
+	yield i;
+} // int_range
+
+function* async_search(iterable, async_predicate) {
+    for (const item of iterable)
+	if (yield* async_predicate(item))
+	    return item;
+    return null;
+} // async_search
 
 function* async_is_prime(x) {
     if (x < 2)
@@ -24,11 +31,6 @@ function* async_is_prime(x) {
     }
     return true;
 } // async_is_prime
-
-function* int_range(from, to) {
-    for (let i = from; i <= to; ++i)
-	yield i;
-} // int_range
 
 function* async_print_matches(iterable, async_predicate) {
     for (const item of iterable) {
